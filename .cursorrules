@@ -1,0 +1,27 @@
+# Licorera Backend AI Instructions
+
+## Arquitectura y Estructura
+Este proyecto utiliza una arquitectura por capas basada en principios SOLID:
+1. **Controllers**: Gestionan las peticiones HTTP (`req`, `res`, `next`). Devuelven respuestas con el formato JSend (`{ status: 'success', data: ... }`). Delegan toda la lógica a los Services. NUNCA hacen consultas a la BD.
+2. **Services**: Contienen la lógica de negocio, cálculos y manejo de transacciones. Lanzan instancias de `AppError` cuando algo falla o un recurso no existe.
+3. **Repositories**: La capa más baja. Sólo ejecutan consultas SQL crudas mediante el driver `pg`. No contienen lógica de negocio.
+
+## Manejo de Errores
+- Utiliza la clase `AppError` (`utils/AppError.js`) para lanzar errores conocidos (ej: `throw new AppError('Producto no encontrado', 404)`).
+- El middleware global `errorHandler` se encargará de interceptarlo y formatearlo en JSON de forma segura. NUNCA devuelvas `res.status(400).json(...)` desde el Service.
+- En los Controladores, usa `try/catch` y pasa el error usando `next(error)`.
+
+## Paginación y Respuestas
+- Todos los métodos `getAll` en los Controladores deben extraer `req.query` y pasarlo al Service, el cual calcula `limit` y `offset` y se lo pasa al Repository.
+- Las respuestas JSON SIEMPRE deben tener la estructura:
+  `{ status: "success", data: ... }`
+
+## Validación
+- Para endpoints POST/PUT, utiliza la librería `zod` para validar el `req.body`.
+- Agrega los esquemas en la carpeta `validations/` e impórtalos en las rutas utilizando el middleware `validateRequest`.
+
+## Dependencias Clave
+- `pg` para consultas SQL. No usamos ORMs por ahora, mantén SQL crudo seguro (usa `$1`, `$2` para evitar inyección SQL).
+- `express` para el servidor.
+- `helmet` y `express-rate-limit` para seguridad.
+- `zod` para validación de datos.

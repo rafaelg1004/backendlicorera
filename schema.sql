@@ -2,7 +2,7 @@
 -- CREATE DATABASE licorera_db;
 -- \c licorera_db;
 
-CREATE TABLE productos (
+CREATE TABLE IF NOT EXISTS productos (
     id SERIAL PRIMARY KEY,
     codigo_barras VARCHAR(100) UNIQUE,
     nombre VARCHAR(255) NOT NULL,
@@ -10,14 +10,14 @@ CREATE TABLE productos (
     stock_minimo INTEGER DEFAULT 0
 );
 
-CREATE TABLE clientes (
+CREATE TABLE IF NOT EXISTS clientes (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
     telefono VARCHAR(50),
     tipo_cliente VARCHAR(50) -- ej: 'regular', 'mayorista'
 );
 
-CREATE TABLE proveedores (
+CREATE TABLE IF NOT EXISTS proveedores (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
     contacto VARCHAR(255),
@@ -25,7 +25,7 @@ CREATE TABLE proveedores (
 );
 
 -- Empleados (Recursos Humanos)
-CREATE TABLE empleados (
+CREATE TABLE IF NOT EXISTS empleados (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
     telefono VARCHAR(50),
@@ -34,7 +34,7 @@ CREATE TABLE empleados (
 );
 
 -- Usuarios (Personas con acceso al sistema web)
-CREATE TABLE usuarios (
+CREATE TABLE IF NOT EXISTS usuarios (
     id SERIAL PRIMARY KEY,
     empleado_id INTEGER REFERENCES empleados(id) ON DELETE SET NULL, -- Opcional: enlazar usuario a empleado
     email VARCHAR(255) UNIQUE NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE usuarios (
     rol VARCHAR(50) DEFAULT 'cajero' -- ej: 'admin', 'cajero'
 );
 
-CREATE TABLE unidades_medida (
+CREATE TABLE IF NOT EXISTS unidades_medida (
     id SERIAL PRIMARY KEY,
     producto_id INTEGER REFERENCES productos(id) ON DELETE CASCADE,
     nombre_unidad VARCHAR(50) NOT NULL,
@@ -50,20 +50,20 @@ CREATE TABLE unidades_medida (
     es_unidad_base BOOLEAN DEFAULT FALSE
 );
 
-CREATE TABLE inventario (
+CREATE TABLE IF NOT EXISTS inventario (
     id SERIAL PRIMARY KEY,
     producto_id INTEGER REFERENCES productos(id) ON DELETE CASCADE,
     cantidad_disponible DECIMAL(10, 4) DEFAULT 0
 );
 
-CREATE TABLE lista_precios (
+CREATE TABLE IF NOT EXISTS lista_precios (
     id SERIAL PRIMARY KEY,
     unidad_medida_id INTEGER REFERENCES unidades_medida(id) ON DELETE CASCADE,
     tipo_cliente VARCHAR(50),
     precio DECIMAL(10, 2) NOT NULL
 );
 
-CREATE TABLE turnos_caja (
+CREATE TABLE IF NOT EXISTS turnos_caja (
     id SERIAL PRIMARY KEY,
     empleado_id INTEGER REFERENCES empleados(id),
     monto_inicial DECIMAL(10, 2) NOT NULL,
@@ -73,7 +73,7 @@ CREATE TABLE turnos_caja (
     fecha_cierre TIMESTAMP
 );
 
-CREATE TABLE pagos_empleados (
+CREATE TABLE IF NOT EXISTS pagos_empleados (
     id SERIAL PRIMARY KEY,
     empleado_id INTEGER REFERENCES empleados(id),
     turno_id INTEGER REFERENCES turnos_caja(id),
@@ -82,14 +82,14 @@ CREATE TABLE pagos_empleados (
     fecha_pago TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE compras (
+CREATE TABLE IF NOT EXISTS compras (
     id SERIAL PRIMARY KEY,
     proveedor_id INTEGER REFERENCES proveedores(id),
     total DECIMAL(10, 2) NOT NULL,
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE detalle_compras (
+CREATE TABLE IF NOT EXISTS detalle_compras (
     id SERIAL PRIMARY KEY,
     compra_id INTEGER REFERENCES compras(id) ON DELETE CASCADE,
     producto_id INTEGER REFERENCES productos(id),
@@ -98,7 +98,7 @@ CREATE TABLE detalle_compras (
     subtotal DECIMAL(10, 2) NOT NULL
 );
 
-CREATE TABLE ventas (
+CREATE TABLE IF NOT EXISTS ventas (
     id SERIAL PRIMARY KEY,
     cliente_id INTEGER REFERENCES clientes(id),
     empleado_id INTEGER REFERENCES empleados(id),
@@ -107,7 +107,7 @@ CREATE TABLE ventas (
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE detalle_ventas (
+CREATE TABLE IF NOT EXISTS detalle_ventas (
     id SERIAL PRIMARY KEY,
     venta_id INTEGER REFERENCES ventas(id) ON DELETE CASCADE,
     producto_id INTEGER REFERENCES productos(id),
@@ -117,7 +117,7 @@ CREATE TABLE detalle_ventas (
     subtotal DECIMAL(10, 2) NOT NULL
 );
 
-CREATE TABLE creditos_prestamos (
+CREATE TABLE IF NOT EXISTS creditos_prestamos (
     id SERIAL PRIMARY KEY,
     venta_id INTEGER REFERENCES ventas(id),
     cliente_id INTEGER REFERENCES clientes(id),

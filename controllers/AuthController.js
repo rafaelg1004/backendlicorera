@@ -24,6 +24,25 @@ class AuthController {
       next(error);
     }
   }
+
+  async getMe(req, res, next) {
+    try {
+      const user = await service.getMe(req.user.id);
+      res.status(200).json({ status: 'success', data: { user } });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async logout(req, res, next) {
+    try {
+      // Como usamos JWT sin estado, el cerrado de sesión real se hace en el cliente (borrando el token).
+      // Aquí simplemente confirmamos la solicitud de logout.
+      res.status(200).json({ status: 'success', message: 'Sesión cerrada correctamente' });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = AuthController;

@@ -50,6 +50,15 @@ class AuthService {
 
     return result.rows[0];
   }
+
+  async getMe(userId) {
+    const result = await db.query('SELECT id, email, rol, empleado_id FROM usuarios WHERE id = $1', [userId]);
+    const user = result.rows[0];
+    if (!user) {
+      throw new AppError('Usuario no encontrado', 404);
+    }
+    return user;
+  }
 }
 
 module.exports = AuthService;

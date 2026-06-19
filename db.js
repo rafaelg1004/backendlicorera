@@ -6,7 +6,7 @@ const pool = new Pool({
   host: process.env.DB_HOST || 'localhost',
   database: process.env.DB_NAME || 'licorera_db',
   password: process.env.DB_PASSWORD || 'password',
-  port: process.env.DB_PORT || 5432,
+  port: parseInt(process.env.DB_PORT, 10) || 5432,
 });
 
 pool.on('error', (err, client) => {

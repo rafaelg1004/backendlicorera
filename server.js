@@ -67,6 +67,23 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'success', message: 'OK' });
 });
 
+app.get('/api/migrate', async (req, res) => {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const schemaPath = path.join(__dirname, 'schema.sql');
+    const schema = fs.readFileSync(schemaPath, 'utf8');
+    
+    const db = require('./db');
+    await db.query(schema);
+    
+    res.status(200).json({ status: 'success', message: 'Tablas creadas correctamente desde schema.sql' });
+  } catch (error) {
+    console.error('Error ejecutando schema.sql:', error);
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+});
+
 app.use(errorHandler);
 
 app.listen(PORT, '0.0.0.0', () => {

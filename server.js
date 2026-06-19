@@ -63,6 +63,10 @@ app.get('/', (req, res) => {
   res.status(200).json({ status: 'success', message: 'API funcionando.' });
 });
 
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'success', message: 'OK' });
+});
+
 app.use(errorHandler);
 
 app.listen(PORT, () => {
